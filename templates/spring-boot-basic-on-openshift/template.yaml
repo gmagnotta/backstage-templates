@@ -14,7 +14,7 @@ metadata:
     - openshift
     - argocd
 spec:
-  owner: piomin
+  owner: developers
   system: microservices
   type: service
 
@@ -133,14 +133,14 @@ spec:
         sourcePath: ./gitops
         repoVisibility: public
 
-    - id: sonarqube
-      name: Create a new project on Sonarcloud
-      action: http:backstage:request
-      input:
-        method: 'POST'
-        path: '/proxy/sonarqube/projects/create?name=${{ parameters.appName }}&organization=${{ parameters.orgName }}&project=${{ parameters.orgName }}_${{ parameters.appName }}'
-        headers:
-          content-type: 'application/json'
+    # - id: sonarqube
+    #   name: Create a new project on Sonarcloud
+    #   action: http:backstage:request
+    #   input:
+    #     method: 'POST'
+    #     path: '/proxy/sonarqube/projects/create?name=${{ parameters.appName }}&organization=${{ parameters.orgName }}&project=${{ parameters.orgName }}_${{ parameters.appName }}'
+    #     headers:
+    #       content-type: 'application/json'
 
 #    - id: sonarqube
 #      name: Create new project on Sonarqube
@@ -163,12 +163,12 @@ spec:
         repoUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config.git
         path: 'manifests'
 
-    - id: create-webhook
-      name: Create GitHub Webhook
-      action: github:webhook
-      input:
-        repoUrl: github.com?repo=${{ parameters.appName }}&owner=${{ parameters.orgName }}
-        webhookUrl: https://el-${{ parameters.appName }}-${{ parameters.namespace }}.${{ parameters.clusterDomain }}
+    # - id: create-webhook
+    #   name: Create GitHub Webhook
+    #   action: github:webhook
+    #   input:
+    #     repoUrl: github.com?repo=${{ parameters.appName }}&owner=${{ parameters.orgName }}
+    #     webhookUrl: https://el-${{ parameters.appName }}-${{ parameters.namespace }}.${{ parameters.clusterDomain }}
 
   output:
     links:
