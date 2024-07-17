@@ -14,7 +14,7 @@ metadata:
     - kubernetes
     - argocd
 spec:
-  owner: piomin
+  owner: developers
   system: microservices
   type: service
 
