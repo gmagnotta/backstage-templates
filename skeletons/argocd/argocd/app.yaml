@@ -18,6 +18,7 @@ spec:
     syncOptions:
       - RespectIgnoreDifferences=true
       - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
     retry:
       backoff:
         duration: 5s
