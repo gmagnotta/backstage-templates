@@ -157,6 +157,7 @@ spec:
       name: Create ArgoCD Resources
       action: argocd:create-resources
       input:
+        projectName: default
         appName: ${{ parameters.appName }}
         argoInstance: main
         namespace: ${{ parameters.namespace }}
