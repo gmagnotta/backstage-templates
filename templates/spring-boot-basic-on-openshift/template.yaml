@@ -160,7 +160,7 @@ spec:
         appName: ${{ parameters.appName }}
         argoInstance: main
         namespace: ${{ parameters.namespace }}
-        repoUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config.git
+        repoUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config
         path: 'manifests'
 
     # - id: create-webhook
