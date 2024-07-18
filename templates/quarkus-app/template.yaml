@@ -131,15 +131,46 @@ spec:
         sourcePath: ./gitops
         repoVisibility: public
 
-    - id: create-argocd-resources
-      name: Create ArgoCD Resources
-      action: argocd:create-resources
+    # - id: create-argocd-resources
+    #   name: Create ArgoCD Resources
+    #   action: argocd:create-resources
+    #   input:
+    #     appName: ${{ parameters.appName }}
+    #     argoInstance: main
+    #     namespace: ${{ parameters.namespace }}
+    #     repoUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config
+    #     path: 'overlay/dev'
+
+    - id: argocd
+      name: Create New Application in Argo CD
+      action: http:backstage:request
       input:
-        appName: ${{ parameters.appName }}
-        argoInstance: main
-        namespace: ${{ parameters.namespace }}
-        repoUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config
-        path: 'overlay/dev'
+        method: 'POST'
+        path: '/proxy/argocd/api/applications'
+        headers:
+          content-type: 'application/json'
+        body:
+          metadata:
+            name: ${{ parameters.appName }}
+            namespace: openshift-gitops
+          spec:
+            project: default
+            source:
+              repoURL: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config.git
+              targetRevision: ${{ values.repoBranchName }}
+              path: overlay/dev
+            destination:
+              server: https://kubernetes.default.svc
+              namespace: ${{ parameters.namespace }}
+            syncPolicy:
+              automated:
+                prune: true
+                selfHeal: true
+              syncOptions:
+                - CreateNamespace=true
+              managedNamespaceMetadata:
+                labels:
+                  argocd.argoproj.io/managed-by: openshift-gitops
 
     # - id: create-webhook
     #   name: Create GitHub Webhook
