@@ -7,3 +7,4 @@ resources:
 - route.yaml
 - configmap.yaml
 - secret.yaml
+- pipeline.yaml
