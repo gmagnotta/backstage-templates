@@ -1,0 +1,33 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: ${{ values.appName }}-build
+  labels:
+    type: pipeline
+    backstage.io/kubernetes-id: ${{ values.appName }}
+spec:
+  params:
+    - name: source-repo
+      description: source repo that contains the application code
+      type: string
+      default: github.com/gmagnotta/mysuperapp
+    - name: source-branch
+      description: source branch to build from
+      default: master
+      type: string
+  tasks:
+    - name: git-clone
+      params:
+        - name: url
+          value: $(params.source-repo)
+        - name: revision
+          value: $(params.source-branch)
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: source-folder
+
+  workspaces:
+    - name: source-folder
