@@ -127,7 +127,7 @@ spec:
         allowedHosts: ['github.com']
         description: ${{ parameters.description }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.appName }}-config
-        defaultBranch: HEAD
+        defaultBranch: ${{ parameters.repoBranchName }}
         sourcePath: ./gitops
         repoVisibility: public
 
