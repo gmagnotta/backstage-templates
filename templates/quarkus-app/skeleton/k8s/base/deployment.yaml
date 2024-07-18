@@ -4,6 +4,7 @@ metadata:
   name: quarkus-echo
   labels:
     app: quarkus-echo
+    backstage.io/kubernetes-id: ${{ values.appName }}
 spec:
   replicas: 1
   selector:
@@ -13,6 +14,7 @@ spec:
     metadata:
       labels:
         app: quarkus-echo
+        backstage.io/kubernetes-id: mysuperapp
     spec:
       containers:
         - name: quarkus-echo

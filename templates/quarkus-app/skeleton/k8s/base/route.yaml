@@ -4,6 +4,7 @@ metadata:
   name: quarkus-echo
   labels:
     app: quarkus-echo
+    backstage.io/kubernetes-id: ${{ values.appName }}
 spec:
   to:
     kind: Service
