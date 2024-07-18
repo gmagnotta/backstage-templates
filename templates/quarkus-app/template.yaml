@@ -127,7 +127,7 @@ spec:
         allowedHosts: ['github.com']
         description: ${{ parameters.description }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.appName }}-config
-        defaultBranch: ${{ parameters.repoBranchName }}
+        defaultBranch: HEAD
         sourcePath: ./gitops
         repoVisibility: public
 
@@ -138,7 +138,7 @@ spec:
         appName: ${{ parameters.appName }}
         argoInstance: main
         namespace: ${{ parameters.namespace }}
-        repoUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config.git
+        repoUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config
         path: 'overlay/dev'
 
     # - id: create-webhook
