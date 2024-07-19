@@ -90,7 +90,7 @@ spec:
           apiPath: ${{ parameters.apiPath }}
           namespace: ${{ parameters.namespace }}
           copyWithoutTemplating:
-            - *_task.yaml
+            - ./skeleton/k8s/overlay/dev/*task.yaml
 
     - id: publish
       name: Publishing to the Source Code Repository
@@ -122,7 +122,7 @@ spec:
           repoBranchName: ${{ parameters.repoBranchName }}
         targetPath: ./gitops
         copyWithoutTemplating:
-          - *_task.yaml
+          - ./skeleton/k8s/overlay/dev/*task.yaml
 
     - id: publish
       name: Publishing to the Config Code Repository
