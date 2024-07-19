@@ -143,6 +143,12 @@ spec:
     #     repoUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config
     #     path: 'overlay/dev'
 
+    - id: wait
+      name: Wait for repo be ready
+      action: roadiehq:utils:sleep
+      input:
+        amout: 15
+
     - id: argocd
       name: Create New Application in Argo CD
       action: http:backstage:request
