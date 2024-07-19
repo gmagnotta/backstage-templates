@@ -10,6 +10,7 @@ resources:
 - vulnerability_sbom_task.yaml
 - hello_tomcat_is.yaml
 - jws_is.yaml
+- pipelinerun.yaml
 
 patchesStrategicMerge:
 - deployment.yaml

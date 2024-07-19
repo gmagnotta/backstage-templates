@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  generateName: hello-tomcat-
+spec:
+  pipelineRef:
+    name: hello5-tomcat-build
+  workspaces:
+    - name: src
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+          volumeMode: Filesystem
+        status: {}
+    - configMap:
+        name: hello-tomcat-s2ienvironment
+      name: env
+    - emptyDir: {}
+      name: secureenv
+    - emptyDir: {}
+      name: artifacts
+    - emptyDir: {}
+      name: empty
