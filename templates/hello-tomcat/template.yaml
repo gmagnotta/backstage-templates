@@ -153,17 +153,17 @@ spec:
           content-type: 'application/json'
         body:
           metadata:
-            name: ${{ values.appName }}
+            name: ${{ parameters.appName }}
             namespace: openshift-gitops
           spec:
             project: default
             source:
-              repoURL: https://github.com/${{ values.orgName }}/${{ values.appName }}-config.git
-              targetRevision: ${{ values.repoBranchName }}
+              repoURL: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config.git
+              targetRevision: ${{ parameters.repoBranchName }}
               path: overlay/dev
             destination:
               server: https://kubernetes.default.svc
-              namespace: ${{ values.namespace }}
+              namespace: ${{ parameters.namespace }}
             syncPolicy:
               automated:
                 prune: true
