@@ -89,8 +89,7 @@ spec:
           javaPackage: ${{ parameters.javaPackage }}
           apiPath: ${{ parameters.apiPath }}
           namespace: ${{ parameters.namespace }}
-        copyWithoutTemplating:
-            - './k8s/overlay/dev/*task.yaml'
+        copyWithoutTemplating: ['**/*task.yaml', '**/*.css.map']
 
     - id: publish
       name: Publishing to the Source Code Repository
@@ -121,8 +120,7 @@ spec:
           namespace: ${{ parameters.namespace }}
           repoBranchName: ${{ parameters.repoBranchName }}
         targetPath: ./gitops
-        copyWithoutTemplating:
-            - './k8s/overlay/dev/*task.yaml'
+        copyWithoutTemplating: ['**/*task.yaml', '**/*.css.map']
 
     - id: publish
       name: Publishing to the Config Code Repository
