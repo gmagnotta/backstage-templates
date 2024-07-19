@@ -22,7 +22,7 @@ spec:
           workspace: src
       params:
         - name: url
-          value: "https://github.com/${{ value.orgName }}/${{ value.appName }}.git"
+          value: "https://github.com/${{ values.orgName }}/${{ values.appName }}.git"
         - name: deleteExisting
           value: "true"
     - name: build
