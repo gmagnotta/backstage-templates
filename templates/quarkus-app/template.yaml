@@ -146,7 +146,7 @@ spec:
       action: http:backstage:request
       input:
         method: 'POST'
-        path: '/api/proxy/argocd/api/applications'
+        path: '/proxy/argocd/api/applications'
         headers:
           content-type: 'application/json'
         body:
