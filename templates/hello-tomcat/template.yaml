@@ -147,7 +147,7 @@ spec:
       name: Wait for repo be ready
       action: roadiehq:utils:sleep
       input:
-        aount: 15
+        amount: 15
 
     - id: argocd
       name: Create New Application in Argo CD
