@@ -10,3 +10,4 @@ spec:
     - templates/spring-boot-basic-on-kubernetes/template.yaml
     - templates/spring-boot-basic-on-openshift/template.yaml
     - templates/quarkus-app/template.yaml
+    - templates/hello-tomcat/template.yaml
