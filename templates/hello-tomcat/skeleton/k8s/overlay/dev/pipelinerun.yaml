@@ -1,10 +1,10 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
-  generateName: hello-tomcat-
+  generateName: ${{ values.appName }}-
 spec:
   pipelineRef:
-    name: hello5-tomcat-build
+    name: ${{ values.appName }}-build
   workspaces:
     - name: src
       volumeClaimTemplate:
