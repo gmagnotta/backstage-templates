@@ -1,0 +1,25 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.appName }}
+  title: ${{ values.appName }}
+  {%- if values.description %}
+  description: ${{values.description | dump}}
+  {%- endif %}
+  annotations:
+    janus-idp.io/tekton: ${{ values.appName }}
+    tektonci/build-namespace: ${{ values.namespace }}
+    github.com/project-slug: ${{ values.orgName }}/${{ values.appName }}
+    backstage.io/kubernetes-id: ${{ values.appName }}
+    argocd/app-name: ${{ values.appName }}
+    prometheus.io/rule: container_memory_usage_bytes{pod=~"${{ values.appName }}-.*"}|pod,rate(container_cpu_usage_seconds_total{pod=~"${{ values.appName }}-.*"}[5m])|pod
+  tags:
+    - quarkus
+    - java
+    - maven
+    - tekton
+    - argocd
+spec:
+  type: service
+  owner: developers
+  lifecycle: experimental

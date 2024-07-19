@@ -1,0 +1,16 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: jws60-openjdk17-openshift-rhel8
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+  - annotations:
+      description: Red Hat JBoss WS 6.0 Image
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/jboss-webserver-6/jws60-openjdk17-openshift-rhel8
+    name: latest
+    referencePolicy:
+      type: Local

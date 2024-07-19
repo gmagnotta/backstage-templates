@@ -1,0 +1,158 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: ${{ values.appName }}-build
+  labels:
+    type: pipeline
+    backstage.io/kubernetes-id: ${{ values.appName }}
+spec:
+  workspaces:
+    - name: src
+    - name: env
+    - name: secureenv
+    - name: artifacts
+    - name: empty
+  tasks:
+    - name: fetch-repository
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      workspaces:
+        - name: output
+          workspace: src
+      params:
+        - name: url
+          value: "https://github.com/${{ value.orgName }}/${{ value.appName }}.git"
+        - name: deleteExisting
+          value: "true"
+    - name: build
+      taskRef:
+        name: buildah-s2i
+      runAfter:
+        - fetch-repository
+      workspaces:
+        - name: source
+          workspace: src
+        - name: environment
+          workspace: env
+        - name: secureenvironment
+          workspace: secureenv
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: BUILDER_IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/jws60-openjdk17-openshift-rhel8"
+        - name: TLSVERIFY
+          value: "false"
+        - name: OUTPUT_IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat"
+        - name: PATH_CONTEXT
+          value: "."
+    - name: generate-sbom
+      taskRef:
+        name: generate-sbom
+      workspaces:
+        - name: source
+          workspace: src
+      runAfter:
+        - build
+      params:
+        - name: IMAGETOSCAN
+          value: "$(tasks.build.results.IMAGE_URL)@$(tasks.build.results.IMAGE_DIGEST)"
+        - name: SBOMFILE
+          value: "$(workspaces.source.path)/tomcat-sbom.cdx"
+        - name: TLSVERIFY
+          value: "false"
+        - name: OUTPUT_IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat:sbom"
+    - name: vuln-scan
+      taskRef:
+        name: vulnerability-sbom
+      workspaces:
+        - name: source
+          workspace: src
+      runAfter:
+        - generate-sbom
+      params:
+        - name: SBOM
+          value: "$(workspaces.source.path)/tomcat-sbom.cdx"
+    - name: deploy
+      taskRef:
+        name: openshift-client
+        kind: ClusterTask
+      runAfter:
+        - vuln-scan
+      workspaces:
+        - name: manifest-dir
+          workspace: src
+      params:
+        - name: SCRIPT
+          value: |
+            cd $(workspaces.manifest-dir.path)/./k8s/overlay/dev
+            
+            cat <<EOF > kustomization.yaml
+            apiVersion: kustomize.config.k8s.io/v1beta1
+            kind: Kustomization
+
+            resources:
+            - ../../base
+            images:
+            - name: hello-tomcat
+              newName: $(tasks.build.results.IMAGE_URL)@$(tasks.build.results.IMAGE_DIGEST)
+            EOF
+
+            oc apply -k .
+    - name: export-image
+      params:
+        - name: srcImageURL
+          value: 'docker://$(tasks.build.results.IMAGE_URL)@$(tasks.build.results.IMAGE_DIGEST)'
+        - name: destImageURL
+          value: 'docker://quay.io/gmagnotta/hello-tomcat:latest'
+        - name: srcTLSverify
+          value: 'false'
+        - name: destTLSverify
+          value: 'false'
+      taskRef:
+        kind: ClusterTask
+        name: skopeo-copy
+      runAfter:
+        - deploy
+      workspaces:
+        - name: images-url
+          workspace: empty
+    - name: export-sig
+      params:
+        - name: srcImageURL
+          value: 'docker://$(tasks.build.results.IMAGE_URL):sha256-$(tasks.build.results.SIMPLE_DIGEST).sig'
+        - name: destImageURL
+          value: 'docker://quay.io/gmagnotta/hello-tomcat:sha256-$(tasks.build.results.SIMPLE_DIGEST).sig'
+        - name: srcTLSverify
+          value: 'false'
+        - name: destTLSverify
+          value: 'false'
+      runAfter:
+        - export-image
+      taskRef:
+        kind: ClusterTask
+        name: skopeo-copy
+      workspaces:
+        - name: images-url
+          workspace: empty
+    - name: export-att
+      params:
+        - name: srcImageURL
+          value: 'docker://$(tasks.build.results.IMAGE_URL):sha256-$(tasks.build.results.SIMPLE_DIGEST).att'
+        - name: destImageURL
+          value: 'docker://quay.io/gmagnotta/hello-tomcat:sha256-$(tasks.build.results.SIMPLE_DIGEST).att'
+        - name: srcTLSverify
+          value: 'false'
+        - name: destTLSverify
+          value: 'false'
+      runAfter:
+        - export-image
+      taskRef:
+        kind: ClusterTask
+        name: skopeo-copy
+      workspaces:
+        - name: images-url
+          workspace: empty

@@ -1,0 +1,25 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: listener
+  namespace: "{{ project }}"
+spec:
+  serviceAccountName: pipeline
+  triggers:
+    - name: trigger
+      interceptors:
+        - ref:
+            name: "github"
+            kind: ClusterInterceptor
+            apiVersion: triggers.tekton.dev
+          params:
+          - name: "secretRef"
+            value:
+              secretName: git-secret
+              secretKey: secretToken
+          - name: "eventTypes"
+            value: ["push"]
+      bindings:
+        - ref: event-binding    
+      template:
+        ref: push-trigger-template
