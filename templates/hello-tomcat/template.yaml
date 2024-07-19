@@ -89,6 +89,7 @@ spec:
           javaPackage: ${{ parameters.javaPackage }}
           apiPath: ${{ parameters.apiPath }}
           namespace: ${{ parameters.namespace }}
+          copyWithoutTemplating: '*_task.yaml'
 
     - id: publish
       name: Publishing to the Source Code Repository
@@ -119,6 +120,7 @@ spec:
           namespace: ${{ parameters.namespace }}
           repoBranchName: ${{ parameters.repoBranchName }}
         targetPath: ./gitops
+        copyWithoutTemplating: '*_task.yaml'
 
     - id: publish
       name: Publishing to the Config Code Repository
