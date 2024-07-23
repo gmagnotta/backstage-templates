@@ -12,6 +12,8 @@ spec:
     - name: secureenv
     - name: artifacts
     - name: empty
+    - name: ssh
+    - name: gitops
   tasks:
     - name: fetch-repository
       taskRef:
@@ -76,16 +78,63 @@ spec:
       params:
         - name: SBOM
           value: "$(workspaces.source.path)/tomcat-sbom.cdx"
-    - name: deploy
+    - name: clone-gitops
       taskRef:
-        name: openshift-client
+        name: git-clone
         kind: ClusterTask
       runAfter:
         - vuln-scan
       workspaces:
+        - name: output
+          workspace: gitops
+      params:
+        - name: url
+          value: "https://github.com/${{ values.orgName }}/${{ values.appName }}-config.git"
+        - name: deleteExisting
+          value: "true"
+    - name: edit-deployment
+      taskRef:
+        name: openshift-client
+        kind: ClusterTask
+      runAfter:
+        - clone-gitops
+      workspaces:
         - name: manifest-dir
-          workspace: src
+          workspace: gitops
       params:
         - name: SCRIPT
           value: |
-            oc rollout restart deployment/hello-tomcat
+            cd $(workspaces.manifest-dir.path)/overlay/dev
+
+            cat <<EOF > deployment.yaml
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: hello-tomcat
+            spec:
+              template:
+                spec:
+                  containers:
+                    - image: $(tasks.build.results.IMAGE_URL)@$(tasks.build.results.IMAGE_DIGEST)
+                      name: hello-tomcat
+                      imagePullPolicy: Always
+            EOF
+    - name: git-commit
+      taskRef:
+        name: git-cli
+        kind: ClusterTask
+      runAfter:
+        - edit-deployment
+      workspaces:
+        - name: ssh-directory
+          workspace: ssh
+      params:
+        - name: GIT_SCRIPT
+          value: |
+            git pull --quiet origin HEAD:master
+
+            git add $(workspaces.manifest-dir.path)/overlay/dev/deployment.yaml
+
+            git commit -m "deploy new image"
+            
+            git push --quiet origin HEAD:master
