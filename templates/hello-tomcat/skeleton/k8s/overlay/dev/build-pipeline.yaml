@@ -87,9 +87,11 @@ spec:
       workspaces:
         - name: output
           workspace: gitops
+        - name: ssh-directory
+          workspace: ssh
       params:
         - name: url
-          value: "https://github.com/${{ values.orgName }}/${{ values.appName }}-config.git"
+          value: "git@github.com:${{ values.orgName }}/${{ values.appName }}-config.git"
         - name: deleteExisting
           value: "true"
     - name: edit-deployment
@@ -126,14 +128,22 @@ spec:
       runAfter:
         - edit-deployment
       workspaces:
+        - name: source
+          workspace: gitops
         - name: ssh-directory
           workspace: ssh
       params:
         - name: GIT_SCRIPT
           value: |
+            git config --global --add safe.directory $(workspaces.source.path)
+            
+            git config --global user.email "giuseppe.magnotta@gmail.com"
+  
+            git config --global user.name "Giuseppe Magnotta BOT"
+
             git pull --quiet origin HEAD:master
 
-            git add $(workspaces.manifest-dir.path)/overlay/dev/deployment.yaml
+            git add $(workspaces.source.path)/overlay/dev/deployment.yaml
 
             git commit -m "deploy new image"
             
