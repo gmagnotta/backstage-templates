@@ -6,10 +6,10 @@ resources:
 - build-pipeline.yaml
 - build-configmap.yaml
 - buildah_s2i_task.yaml
-- generate_sbom_task.yaml
 - vulnerability_sbom_task.yaml
 - hello_tomcat_is.yaml
 - jws_is.yaml
+- task-rekor-signed-provenance.yaml
 
 patchesStrategicMerge:
 - deployment.yaml
