@@ -13,9 +13,6 @@ spec:
       description: The location of the path to run s2i from
       name: PATH_CONTEXT
       type: string
-    - name: SBOMFILE
-      default: 'result.cdx'
-      type: string
     - default: 'true'
       description: >-
         Verify the TLS on the registry endpoint (for push/pull to a non-TLS
@@ -28,10 +25,6 @@ spec:
     - default: 'quay.io/buildah/stable:latest'
       description: The location of the buildah builder image.
       name: BUILDAH_IMAGE
-      type: string
-    - default: 'docker.io/anchore/syft@sha256:803d8af5b740fbaa75bd780b947d32721148f8464efbee9b656bb5f2a5dcf176'
-      description: The location of the syft tool.
-      name: SYFT_IMAGE
       type: string
     - default: 'false'
       description: Skip pushing the built image
@@ -64,7 +57,7 @@ spec:
       type: string
   steps:
     - image: $(params.BUILDAH_IMAGE)
-      name: build
+      name: build-and-push
       resources: {}
       script: |
         #!/usr/bin/env bash
@@ -206,37 +199,7 @@ spec:
 
         echo "Deleting temporary images"
         buildah $BUILDAH_PARAMS rm $builder
-    - name: generate-sbom
-      image: $(params.SYFT_IMAGE)
-      resources: {}
-      args: ["$(params.OUTPUT_IMAGE)", "-o", "syft-table", "-o", "cyclonedx-json=$(params.SBOMFILE)"]
-    - name: copy-sbom
-      resources: {}
-      image: $(params.BUILDAH_IMAGE)
-      script: |
-        #!/usr/bin/env bash
 
-        set -eu -o pipefail
-
-        OUTPUT_IMAGE=$(params.OUTPUT_IMAGE)
-        TLSVERIFY=$(params.TLSVERIFY)
-        BUILDAH_PARAMS=$(params.BUILDAH_PARAMS)
-
-        builder=$(buildah $BUILDAH_PARAMS from --tls-verify=$TLSVERIFY OUTPUT_IMAGE)
-
-        echo "Copy from $(params.SBOMFILE) to /root/buildinfo/content_manifests/"
-        buildah $BUILDAH_PARAMS add --chown 0:0 $builder $(params.SBOMFILE) /root/buildinfo/content_manifests/
-
-        echo "Committing image $OUTPUT_IMAGE"
-        buildah $BUILDAH_PARAMS commit $builder $OUTPUT_IMAGE
-
-        echo "Deleting temporary images"
-        buildah $BUILDAH_PARAMS rm $builder
-    - name: push
-      resources: {}
-      image: $(params.BUILDAH_IMAGE)
-      script: |
-        #!/usr/bin/env bash
 
         [[ "$(params.SKIP_PUSH)" == "true" ]] && echo "Push skipped" && exit 0
 

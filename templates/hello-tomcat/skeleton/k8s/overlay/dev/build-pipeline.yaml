@@ -52,8 +52,23 @@ spec:
           value: "image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat"
         - name: PATH_CONTEXT
           value: "."
+    - name: generate-sbom
+      taskRef:
+        name: generate-sbom
+      workspaces:
+        - name: source
+          workspace: src
+      runAfter:
+        - build
+      params:
+        - name: IMAGETOSCAN
+          value: "$(tasks.build.results.IMAGE_URL)@$(tasks.build.results.IMAGE_DIGEST)"
         - name: SBOMFILE
           value: "$(workspaces.source.path)/tomcat-sbom.cdx"
+        - name: TLSVERIFY
+          value: "false"
+        - name: OUTPUT_IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat"
     - name: vuln-scan
       taskRef:
         name: vulnerability-sbom
@@ -61,14 +76,14 @@ spec:
         - name: source
           workspace: src
       runAfter:
-        - build
+        - generate-sbom
       params:
         - name: SBOM
           value: "$(workspaces.source.path)/tomcat-sbom.cdx"
     - name: query-rekor-signed-provenance
       params:
         - name: imageDigest
-          value: $(tasks.build.results.IMAGE_DIGEST)
+          value: $(tasks.generate-sbom.results.IMAGE_DIGEST)
       taskRef:
         kind: Task
         name: rekor-signed-provenance
@@ -137,10 +152,10 @@ spec:
   
             git config --global user.name "Giuseppe Magnotta BOT"
 
-            git pull --quiet origin HEAD:master
+            git pull --quiet origin HEAD:${{ values.defaultBranch }}
 
             git add $(workspaces.source.path)/overlay/dev/deployment.yaml
 
             git commit -m "deploy new image $(tasks.build.results.IMAGE_URL)@$(tasks.build.results.IMAGE_DIGEST)"
             
-            git push --quiet origin HEAD:master
+            git push --quiet origin HEAD:${{ values.defaultBranch }}
