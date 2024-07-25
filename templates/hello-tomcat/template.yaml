@@ -94,7 +94,7 @@ spec:
           appName: ${{ parameters.appName }}
           registryUrl: ${{ parameters.registryUrl }}
           namespace: ${{ parameters.namespace }}
-          repoBranchName: ${{ parameters.repoBranchName }}
+          defaultBranch: ${{ parameters.repoBranchName }}
         targetPath: ./gitops
         copyWithoutTemplating: ['**/*task.yaml', '**/*.css.map']
 
