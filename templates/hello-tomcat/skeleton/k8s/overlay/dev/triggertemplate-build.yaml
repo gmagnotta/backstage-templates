@@ -1,0 +1,65 @@
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: ${{ values.appName }}-run-build
+spec:
+  params:
+    - name: git-revision
+      description: The git revision
+      default: ${{ values.defaultBranch }}
+    - name: git-repo-url
+      description: The repo url
+    # - name: output-image
+    #   description: reference of the image that will get created
+    #   default: {{ include "image.dev-url" . }}
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        name: $(uid)
+        labels:
+          backstage.io/kubernetes-id: ${{ values.appName }}
+      spec:
+        # params:
+        #   - name: source-repo
+        #     value: $(tt.params.git-repo-url)
+        #   - name: source-branch
+        #     value: $(tt.params.git-revision)
+        #   - name: output-image
+        #     value: $(tt.params.output-image)
+        #   - name: rekor-url
+        #     value: http://rekor-server.rekor.svc
+        pipelineRef:
+          name: ${{ values.appName }}-build
+        serviceAccountName: pipeline
+        timeout: 1h0m0s
+        workspaces:
+          - name: src
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+          - configMap:
+              name: hello-tomcat-s2ienvironment
+            name: env
+          - emptyDir: {}
+            name: secureenv
+          - emptyDir: {}
+            name: artifacts
+          - emptyDir: {}
+            name: empty
+          - name: ssh
+            secret:
+              secretName: gitops
+          - name: gitops
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi

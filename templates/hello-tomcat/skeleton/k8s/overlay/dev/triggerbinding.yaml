@@ -1,9 +1,0 @@
-apiVersion: triggers.tekton.dev/v1alpha1
-kind: TriggerBinding
-metadata:
-  name: event-binding
-  namespace: "{{ project }}"
-spec:
-  params:
-    - name: git-repository-url
-      value: $(body.repository.url) 
