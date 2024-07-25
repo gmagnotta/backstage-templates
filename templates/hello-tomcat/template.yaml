@@ -89,6 +89,7 @@ spec:
           javaPackage: ${{ parameters.javaPackage }}
           apiPath: ${{ parameters.apiPath }}
           namespace: ${{ parameters.namespace }}
+          defaultBranch: ${{ parameters.repoBranchName }}
 
     - id: publish
       name: Publishing to the Source Code Repository

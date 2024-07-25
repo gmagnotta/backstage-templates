@@ -25,6 +25,8 @@ spec:
       params:
         - name: url
           value: "https://github.com/${{ values.orgName }}/${{ values.appName }}.git"
+        - name: revision
+          value: "${{ values.defaultBranch }}"
         - name: deleteExisting
           value: "true"
     - name: build
@@ -50,23 +52,8 @@ spec:
           value: "image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat"
         - name: PATH_CONTEXT
           value: "."
-    - name: generate-sbom
-      taskRef:
-        name: generate-sbom
-      workspaces:
-        - name: source
-          workspace: src
-      runAfter:
-        - build
-      params:
-        - name: IMAGETOSCAN
-          value: "$(tasks.build.results.IMAGE_URL)@$(tasks.build.results.IMAGE_DIGEST)"
         - name: SBOMFILE
           value: "$(workspaces.source.path)/tomcat-sbom.cdx"
-        - name: TLSVERIFY
-          value: "false"
-        - name: OUTPUT_IMAGE
-          value: "image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat:sbom"
     - name: vuln-scan
       taskRef:
         name: vulnerability-sbom
@@ -74,16 +61,25 @@ spec:
         - name: source
           workspace: src
       runAfter:
-        - generate-sbom
+        - build
       params:
         - name: SBOM
           value: "$(workspaces.source.path)/tomcat-sbom.cdx"
+    - name: query-rekor-signed-provenance
+      params:
+        - name: imageDigest
+          value: $(tasks.build.results.IMAGE_DIGEST)
+      taskRef:
+        kind: Task
+        name: rekor-signed-provenance
+      runAfter:
+      - vuln-scan
     - name: clone-gitops
       taskRef:
         name: git-clone
         kind: ClusterTask
       runAfter:
-        - vuln-scan
+        - query-rekor-signed-provenance
       workspaces:
         - name: output
           workspace: gitops
@@ -145,6 +141,6 @@ spec:
 
             git add $(workspaces.source.path)/overlay/dev/deployment.yaml
 
-            git commit -m "deploy new image"
+            git commit -m "deploy new image $(tasks.build.results.IMAGE_URL)@$(tasks.build.results.IMAGE_DIGEST)"
             
             git push --quiet origin HEAD:master
