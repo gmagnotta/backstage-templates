@@ -13,3 +13,7 @@ spec:
     kind: Service
     name: el-${{ values.appName }}-el
     weight: 100
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+    destinationCACertificate: ''

@@ -12,7 +12,7 @@ resources:
 - jws_is.yaml
 - task-rekor-signed-provenance.yaml
 - el.yaml
-- git_secret.yaml
+- git_secrets.yaml
 - route-el.yaml
 - triggerbinding-commit.yaml
 - triggertemplate-build.yaml

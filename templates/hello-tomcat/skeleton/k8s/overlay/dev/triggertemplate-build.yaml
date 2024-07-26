@@ -54,7 +54,7 @@ spec:
             name: empty
           - name: ssh
             secret:
-              secretName: gitops
+              secretName: git-secrets
           - name: gitops
             volumeClaimTemplate:
               spec:
