@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
 - ../../base
-- build-pipeline.yaml
+- pipeline-build.yaml
 - build-configmap.yaml
 - buildah_s2i_task.yaml
 - generate_sbom_task.yaml
@@ -11,6 +11,11 @@ resources:
 - hello_tomcat_is.yaml
 - jws_is.yaml
 - task-rekor-signed-provenance.yaml
+- el.yaml
+- git_secret.yaml
+- route-el.yaml
+- triggerbinding-commit.yaml
+- triggertemplate-build.yaml
 
 patchesStrategicMerge:
 - deployment.yaml

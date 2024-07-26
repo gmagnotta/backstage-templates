@@ -7,16 +7,25 @@ spec:
   serviceAccountName: pipeline
   triggers:
     - bindings:
-        - kind: TriggerBinding
-          ref: commit-binding
+        - ref: commit-binding
+          kind: TriggerBinding
       interceptors:
-        - params:
+        - ref:
+            name: "github"
+            kind: ClusterInterceptor
+            apiVersion: triggers.tekton.dev
+          params:
+          - name: "secretRef"
+            value:
+              secretName: git-secrets
+              secretKey: webhookSecret
+        - ref:
+            name: cel
+          params:
             - name: filter
               value: 'body["ref"].contains("main") && header.match("X-GitHub-Event", "push")'
             - name: overlays
               value: null
-          ref:
-            name: cel
       name: commit-trig
       template:
         ref: ${{ values.appName }}-run-build

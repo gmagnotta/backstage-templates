@@ -123,7 +123,7 @@ spec:
       name: Wait for repo be ready
       action: roadiehq:utils:sleep
       input:
-        amount: 10
+        amount: 5
 
     - id: argocd
       name: Create New Application in Argo CD
@@ -156,12 +156,15 @@ spec:
                 labels:
                   argocd.argoproj.io/managed-by: openshift-gitops
 
-    # - id: create-webhook
-    #   name: Create GitHub Webhook
-    #   action: github:webhook
-    #   input:
-    #     repoUrl: github.com?repo=${{ parameters.appName }}&owner=${{ parameters.orgName }}
-    #     webhookUrl: https://el-${{ parameters.appName }}-${{ parameters.namespace }}.${{ parameters.clusterDomain }}
+    - id: create-webhook
+      name: Create GitHub Webhook
+      action: github:webhook
+      input:
+        repoUrl: github.com?repo=${{ parameters.appName }}&owner=${{ parameters.orgName }}
+        webhookUrl: https://webhook-${{ parameters.appName }}-el-${{ parameters.namespace }}.${{ parameters.clusterDomain }}
+        webhookSecret: mysupersecurepassword
+        contentType: json
+        insecureSsl: true
 
   output:
     links:
