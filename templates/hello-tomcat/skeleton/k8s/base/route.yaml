@@ -14,3 +14,7 @@ spec:
     name: hello-tomcat
     weight: 100
   wildcardPolicy: None
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
+    destinationCACertificate: ''
