@@ -17,4 +17,3 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Allow
-    destinationCACertificate: ''

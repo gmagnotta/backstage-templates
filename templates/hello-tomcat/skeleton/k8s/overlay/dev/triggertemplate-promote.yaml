@@ -5,18 +5,10 @@ metadata:
   name: ${{ values.appName }}-run-promote
 spec:
   params:
-    - name: source-image
+    - name: source-image-hash
       description: The source image to promote
-      default: {{ include "image.dev-url" . }}
-    - name: destination-image
-      description: The destination to copy the image to
-      default: {{ include "image.preprod-url" . }}
-    - name: source-tag
-      description: The image tag to promote
-    - name: destination-tag
-      description: The git tag representing the new version or release
-    - name: namespace
-      description: The target namespace being deployed to
+    - name: dest-image-tag
+      description: The dest image to tag
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -26,30 +18,25 @@ spec:
           backstage.io/kubernetes-id: ${{ values.appName }}
       spec:
         params:
-          - name: source-image
-            value: $(tt.params.source-image)
-          - name: destination-image
-            value: $(tt.params.destination-image)
-          - name: source-image-tag
-            value: $(tt.params.source-tag)
-          - name: destination-image-tag
-            value: $(tt.params.destination-tag)
-          - name: namespace
-            value: $(tt.params.namespace)
-          - name: git-host
-            value: gitlab-gitlab{{ .Values.app.cluster }}
-          - name: git-owner
-            value: {{ .Values.git.org }}
-          - name: component-id
-            value: ${{ values.appName }}
-          - name: common-password-secret
-            value: common-password-secret
-          - name: argocd-host
-            value: argocd-server-janus-argocd{{ .Values.app.cluster }}
+          - name: source-image-hash
+            value: $(tt.params.source-image-hash)
+          - name: dest-image-tag
+            value: $(tt.params.dest-image-tag)
         pipelineRef:
           name: ${{ values.appName }}-promote
-        serviceAccountName: image-pusher
+        serviceAccountName: pipeline
         timeout: 1h0m0s
         workspaces:
           - name: images-url
             emptyDir: {}
+          - name: ssh
+            secret:
+              secretName: git-secrets
+          - name: gitops
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi

@@ -16,6 +16,9 @@ resources:
 - route-el.yaml
 - triggerbinding-commit.yaml
 - triggertemplate-build.yaml
+- triggerbinding-tag-preprod.yaml
+- triggertemplate-promote.yaml
+- pipeline-promote.yaml
 
 patchesStrategicMerge:
 - deployment.yaml

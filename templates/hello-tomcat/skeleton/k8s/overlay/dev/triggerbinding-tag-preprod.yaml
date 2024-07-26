@@ -4,9 +4,7 @@ metadata:
   name: tag-binding-preprod
 spec:
   params:
-    - name: source-tag
-      value: latest
-    - name: destination-tag
-      value: $(extensions.tag_version)
-    - name: namespace
-      value: {{ .Values.app.name }}-preprod
+    - name: source-image-hash
+      value: $(extensions.source_image_hash)
+    - name: dest-image-tag
+      value: $(extensions.dest_image_tag)

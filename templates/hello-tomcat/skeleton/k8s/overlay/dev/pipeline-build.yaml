@@ -152,7 +152,7 @@ spec:
             
             git config --global user.email "giuseppe.magnotta@gmail.com"
   
-            git config --global user.name "Giuseppe Magnotta BOT"
+            git config --global user.name "TEKTON CI"
 
             git pull --quiet origin HEAD:${{ values.defaultBranch }}
 

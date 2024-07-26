@@ -29,33 +29,52 @@ spec:
       name: commit-trig
       template:
         ref: ${{ values.appName }}-run-build
+    # - bindings:
+    #     - kind: TriggerBinding
+    #       ref: tag-binding-preprod
+    #   interceptors:
+    #     - params:
+    #         - name: filter
+    #           value: 'header.match("X-GitHub-Event", "push")'
+    #         - name: overlays
+    #           value:
+    #             - expression: 'body.ref.split(''/'')[2]'
+    #               key: tag_version
+    #       ref:
+    #         kind: ClusterInterceptor
+    #         name: cel
+    #   name: tag-trig-preprod
+    #   template:
+    #     ref: ${{ values.appName }}-run-promote
+    # - bindings:
+    #     - kind: TriggerBinding
+    #       ref: tag-binding-prod
+    #   interceptors:
+    #     - params:
+    #         - name: filter
+    #           value: 'header.match("X-GitHub-Event", "release")'
+    #       ref:
+    #         kind: ClusterInterceptor
+    #         name: cel
+    #   name: tag-trig-prod
+    #   template:
+    #     ref: ${{ values.appName }}-run-promote
     - bindings:
         - kind: TriggerBinding
           ref: tag-binding-preprod
       interceptors:
         - params:
             - name: filter
-              value: 'header.match("X-GitHub-Event", "push")'
+              value: 'header.match("X-Internal-Event", "promote")'
             - name: overlays
               value:
-                - expression: 'body.ref.split(''/'')[2]'
-                  key: tag_version
+                - expression: 'body.source_image_hash'
+                  key: source_image_hash
+                - expression: 'body.dest_image_tag'
+                  key: dest_image_tag
           ref:
             kind: ClusterInterceptor
             name: cel
       name: tag-trig-preprod
-      template:
-        ref: ${{ values.appName }}-run-promote
-    - bindings:
-        - kind: TriggerBinding
-          ref: tag-binding-prod
-      interceptors:
-        - params:
-            - name: filter
-              value: 'header.match("X-GitHub-Event", "release")'
-          ref:
-            kind: ClusterInterceptor
-            name: cel
-      name: tag-trig-prod
       template:
         ref: ${{ values.appName }}-run-promote

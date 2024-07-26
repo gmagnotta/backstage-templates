@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-tomcat
+spec:
+  template:
+    spec:
+      containers:
+        - image: quay.io/gmagnotta/hello-tomcat:stable
+          name: hello-tomcat
+          imagePullPolicy: Always

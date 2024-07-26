@@ -8,45 +8,17 @@ metadata:
     backstage.io/kubernetes-id: {{ .Values.app.name }}
 spec:
   params:
-    - name: source-image
-      description: source image to promote
+    - name: source-image-hash
       type: string
-      default: {{ include "image.dev-url" . }}
-    - name: destination-image
-      description: destination image to promote to
-      type: string
-      default: {{ include "image.preprod-url" . }}
-    - name: source-image-tag
-      type: string
-      default: latest
-    - name: destination-image-tag
-      type: string
-      default: latest
-    - name: namespace
-      type: string
-    - description: The hostname of the git instance
-      name: git-host
-      type: string
-    - description: The owner of the repo
-      name: git-owner
-      type: string
-    - description: The name of the component
-      name: component-id
-      type: string
-    - description: Common password used in demo
-      name: common-password-secret
-      type: string
-    - description: ArgoCD host
-      name: argocd-host
+    - name: dest-image-tag
       type: string
   tasks:
-{{- if eq .Values.image.registry "Quay" }}
-    - name: quay-tag-promote
+    - name: copy-image
       params:
         - name: srcImageURL
-          value: 'docker://$(params.source-image):$(params.source-image-tag)'
+          value: 'docker://image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat@sha256:$(params.source-image-hash)'
         - name: destImageURL
-          value: 'docker://$(params.source-image):$(params.destination-image-tag)'
+          value: 'docker://quay.io/gmagnotta/hello-tomcat:$(params.dest-image-tag)'
         - name: srcTLSverify
           value: 'false'
         - name: destTLSverify
@@ -57,62 +29,115 @@ spec:
       workspaces:
         - name: images-url
           workspace: images-url
-    - name: patch-deployment
+    - name: copy-att
       params:
-        - name: namespace
-          value: $(params.namespace)
-        - name: git-host
-          value:  $(params.git-host)
-        - name: git-owner
-          value:  $(params.git-owner)
-        - name: component-id
-          value:  $(params.component-id)
-        - name: common-password-secret
-          value:  $(params.common-password-secret)
-        - name: image-tag
-          value: $(params.destination-image-tag)
-        - name: argocd-host
-          value:  $(params.argocd-host)
+        - name: srcImageURL
+          value: 'docker://image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat:sha256-$(params.source-image-hash).att'
+        - name: destImageURL
+          value: 'docker://quay.io/gmagnotta/hello-tomcat:sha256-$(params.source-image-hash).att'
+        - name: srcTLSverify
+          value: 'false'
+        - name: destTLSverify
+          value: 'false'
       taskRef:
-        kind: Task
-        name: update-deployment
+        kind: ClusterTask
+        name: skopeo-copy
+      workspaces:
+        - name: images-url
+          workspace: images-url
+    - name: copy-sig
+      params:
+        - name: srcImageURL
+          value: 'docker://image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat:sha256-$(params.source-image-hash).sig'
+        - name: destImageURL
+          value: 'docker://quay.io/gmagnotta/hello-tomcat:sha256-$(params.source-image-hash).sig'
+        - name: srcTLSverify
+          value: 'false'
+        - name: destTLSverify
+          value: 'false'
+      taskRef:
+        kind: ClusterTask
+        name: skopeo-copy
+      workspaces:
+        - name: images-url
+          workspace: images-url
+    - name: clone-gitops
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
       runAfter:
-        - quay-tag-promote
-{{- else }}
-    - name: copy-image-tag
-      params:
-        - name: srcImageURL
-          value: 'docker://$(params.source-image):$(params.source-image-tag)'
-        - name: destImageURL
-          value: 'docker://$(params.destination-image):$(params.destination-image-tag)'
-        - name: srcTLSverify
-          value: 'false'
-        - name: destTLSverify
-          value: 'false'
-      taskRef:
-        kind: ClusterTask
-        name: skopeo-copy
+        - copy-image
+        - copy-att
+        - copy-sig
       workspaces:
-        - name: images-url
-          workspace: images-url
-    - name: copy-image-latest
+        - name: output
+          workspace: gitops
+        - name: ssh-directory
+          workspace: ssh
       params:
-        - name: srcImageURL
-          value: 'docker://$(params.source-image):$(params.source-image-tag)'
-        - name: destImageURL
-          value: 'docker://$(params.destination-image):latest'
-        - name: srcTLSverify
-          value: 'false'
-        - name: destTLSverify
-          value: 'false'
+        - name: url
+          value: "git@github.com:${{ values.orgName }}/${{ values.appName }}-config.git"
+        - name: revision
+          value: "${{ values.defaultBranch }}"
+        - name: deleteExisting
+          value: "true"
+    - name: edit-deployment
       taskRef:
+        name: openshift-client
         kind: ClusterTask
-        name: skopeo-copy
       runAfter:
-        - copy-image-tag
+        - clone-gitops
       workspaces:
-        - name: images-url
-          workspace: images-url
-{{- end }}
+        - name: manifest-dir
+          workspace: gitops
+      params:
+        - name: SCRIPT
+          value: |
+            mkdir -p $(workspaces.manifest-dir.path)/overlay/test
+
+            cd $(workspaces.manifest-dir.path)/overlay/test
+
+            cat <<EOF > deployment.yaml
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: hello-tomcat
+            spec:
+              template:
+                spec:
+                  containers:
+                    - image: quay.io/gmagnotta/hello-tomcat:$(params.dest-image-tag)
+                      name: hello-tomcat
+                      imagePullPolicy: Always
+            EOF
+    - name: git-commit
+      taskRef:
+        name: git-cli
+        kind: ClusterTask
+      runAfter:
+        - edit-deployment
+      workspaces:
+        - name: source
+          workspace: gitops
+        - name: ssh-directory
+          workspace: ssh
+      params:
+        - name: GIT_SCRIPT
+          value: |
+            git config --global --add safe.directory $(workspaces.source.path)
+            
+            git config --global user.email "giuseppe.magnotta@gmail.com"
+  
+            git config --global user.name "Tekton CI"
+
+            git pull --quiet origin HEAD:${{ values.defaultBranch }}
+
+            git add $(workspaces.source.path)/overlay/test/deployment.yaml
+
+            git commit -m "deploy new image quay.io/gmagnotta/hello-tomcat:$(params.dest-image-tag)"
+            
+            git push --quiet origin HEAD:${{ values.defaultBranch }}
   workspaces:
     - name: images-url
+    - name: ssh
+    - name: gitops
