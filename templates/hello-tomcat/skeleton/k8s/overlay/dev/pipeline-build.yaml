@@ -130,7 +130,7 @@ spec:
               template:
                 spec:
                   containers:
-                    - image: $(tasks.build.results.IMAGE_URL)@$(tasks.build.results.IMAGE_DIGEST)
+                    - image: $(tasks.generate-sbom.results.IMAGE_URL)@$(tasks.generate-sbom.results.IMAGE_DIGEST)
                       name: hello-tomcat
                       imagePullPolicy: Always
             EOF
@@ -158,6 +158,6 @@ spec:
 
             git add $(workspaces.source.path)/overlay/dev/deployment.yaml
 
-            git commit -m "deploy new image $(tasks.build.results.IMAGE_URL)@$(tasks.build.results.IMAGE_DIGEST)"
+            git commit -m "deploy new image $(tasks.generate-sbom.results.IMAGE_URL)@$(tasks.generate-sbom.results.IMAGE_DIGEST)"
             
             git push --quiet origin HEAD:${{ values.defaultBranch }}
