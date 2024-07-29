@@ -26,13 +26,12 @@ spec:
         kubernetes.io/change-cause: first deploy
       labels:
         app: hello-tomcat
-        backstage.io/kubernetes-id: ${{ values.appName }}
     spec:
       containers:
       - env:
         - name: DNS_MEMBERSHIP_SERVICE_NAME
           value: hello-tomcat-ping
-        image: quay.io/gmagnotta/hello-tomcat:stable
+        image: k8s.gcr.io/pause
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:

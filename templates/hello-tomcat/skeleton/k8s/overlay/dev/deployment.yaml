@@ -6,6 +6,9 @@ metadata:
   name: hello-tomcat
 spec:
   template:
+    metadata:
+      labels:
+        backstage.io/kubernetes-id: ${{ values.appName }}
     spec:
       containers:
         - image: image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}-dev/hello-tomcat:stable
