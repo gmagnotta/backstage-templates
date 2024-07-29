@@ -31,7 +31,7 @@ spec:
             emptyDir: {}
           - name: ssh
             secret:
-              secretName: git-secrets
+              secretName: gitops-secrets
           - name: gitops
             volumeClaimTemplate:
               spec:
