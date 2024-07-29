@@ -192,7 +192,7 @@ spec:
       action: github:webhook
       input:
         repoUrl: github.com?repo=${{ parameters.appName }}&owner=${{ parameters.orgName }}
-        webhookUrl: https://webhook-${{ parameters.appName }}-el-${{ parameters.namespace }}.${{ parameters.clusterDomain }}
+        webhookUrl: https://webhook-${{ parameters.appName }}-el-${{ parameters.namespace }}-dev.${{ parameters.clusterDomain }}
         webhookSecret: mysupersecurepassword
         contentType: json
         insecureSsl: true
