@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    backstage.io/kubernetes-id: ${{ values.appName }}
   name: hello-tomcat
 spec:
   template:

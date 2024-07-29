@@ -6,7 +6,6 @@ metadata:
     template: hello-tomcat
     app.kubernetes.io/name: hello-tomcat
     app.kubernetes.io/part-of: hello-tomcat
-    backstage.io/kubernetes-id: ${{ values.appName }}
   name: hello-tomcat
 spec:
   progressDeadlineSeconds: 600

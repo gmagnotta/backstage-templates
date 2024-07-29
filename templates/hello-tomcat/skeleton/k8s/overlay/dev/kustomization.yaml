@@ -19,6 +19,9 @@ resources:
 - triggerbinding-tag-preprod.yaml
 - triggertemplate-promote.yaml
 - pipeline-promote.yaml
+- route.yaml
+- service.yaml
+- service.ping.yaml
 
 patchesStrategicMerge:
 - deployment.yaml

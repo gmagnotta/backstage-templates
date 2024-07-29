@@ -4,7 +4,6 @@ metadata:
   labels:
     app: hello-tomcat
     template: hello-tomcat
-    backstage.io/kubernetes-id: ${{ values.appName }}
   name: hello-tomcat
 spec:
   port:
