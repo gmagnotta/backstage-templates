@@ -204,5 +204,8 @@ spec:
       - title: Open the Catalog Info Component
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
-      - title: SonarQube project URL
-        url: ${{ steps['create-sonar-project'].output.projectUrl }}
+      #- title: SonarQube project URL
+      #  url: ${{ steps['create-sonar-project'].output.projectUrl }}
+    text:
+      - title: Things to do
+        content: You need to create ssh credentials to let the pipeline commit code and check repository permissions
