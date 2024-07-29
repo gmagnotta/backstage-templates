@@ -15,7 +15,7 @@ spec:
     - name: copy-image
       params:
         - name: srcImageURL
-          value: 'docker://image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat@sha256:$(params.source-image-hash)'
+          value: 'docker://image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}-dev/hello-tomcat@sha256:$(params.source-image-hash)'
         - name: destImageURL
           value: 'docker://quay.io/gmagnotta/hello-tomcat:$(params.dest-image-tag)'
         - name: srcTLSverify
@@ -31,7 +31,7 @@ spec:
     - name: copy-att
       params:
         - name: srcImageURL
-          value: 'docker://image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat:sha256-$(params.source-image-hash).att'
+          value: 'docker://image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}-dev/hello-tomcat:sha256-$(params.source-image-hash).att'
         - name: destImageURL
           value: 'docker://quay.io/gmagnotta/hello-tomcat:sha256-$(params.source-image-hash).att'
         - name: srcTLSverify
@@ -47,7 +47,7 @@ spec:
     - name: copy-sig
       params:
         - name: srcImageURL
-          value: 'docker://image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}/hello-tomcat:sha256-$(params.source-image-hash).sig'
+          value: 'docker://image-registry.openshift-image-registry.svc:5000/${{ values.namespace }}-dev/hello-tomcat:sha256-$(params.source-image-hash).sig'
         - name: destImageURL
           value: 'docker://quay.io/gmagnotta/hello-tomcat:sha256-$(params.source-image-hash).sig'
         - name: srcTLSverify
