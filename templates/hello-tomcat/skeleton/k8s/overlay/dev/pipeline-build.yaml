@@ -158,6 +158,6 @@ spec:
 
             git add $(workspaces.source.path)/overlay/dev/deployment.yaml
 
-            git commit -m "deploy new image $(tasks.generate-sbom.results.IMAGE_URL)@$(tasks.generate-sbom.results.IMAGE_DIGEST)"
+            git commit -m "Deploy new image in dev $(tasks.generate-sbom.results.IMAGE_URL)@$(tasks.generate-sbom.results.IMAGE_DIGEST)"
             
             git push --quiet origin HEAD:${{ values.defaultBranch }}

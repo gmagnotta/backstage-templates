@@ -134,7 +134,7 @@ spec:
 
             git add $(workspaces.source.path)/overlay/test/deployment.yaml
 
-            git commit -m "deploy new image quay.io/gmagnotta/hello-tomcat:$(params.dest-image-tag)"
+            git commit -m "Deploy new image in test quay.io/gmagnotta/hello-tomcat:$(params.dest-image-tag)"
             
             git push --quiet origin HEAD:${{ values.defaultBranch }}
   workspaces:
