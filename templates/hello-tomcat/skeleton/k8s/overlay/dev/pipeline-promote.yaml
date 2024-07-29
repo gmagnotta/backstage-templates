@@ -1,11 +1,10 @@
----
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: {{ .Values.app.name }}-promote
+  name: ${{ values.appName }}-promote
   labels:
     type: pipeline
-    backstage.io/kubernetes-id: {{ .Values.app.name }}
+    backstage.io/kubernetes-id: ${{ values.appName }}
 spec:
   params:
     - name: source-image-hash
