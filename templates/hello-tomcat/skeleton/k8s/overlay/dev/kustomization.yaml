@@ -21,7 +21,7 @@ resources:
 - pipeline-promote.yaml
 - route.yaml
 - service.yaml
-- service.ping.yaml
+- service-ping.yaml
 
 patchesStrategicMerge:
 - deployment.yaml
