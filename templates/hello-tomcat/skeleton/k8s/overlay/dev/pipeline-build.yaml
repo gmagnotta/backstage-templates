@@ -102,7 +102,7 @@ spec:
           workspace: ssh
       params:
         - name: url
-          value: "git@github.com:${{ values.orgName }}/${{ values.appName }}-config.git"
+          value: "git@github.com:${{ values.orgName }}/${{ values.appName }}-gitops.git"
         - name: revision
           value: "${{ values.defaultBranch }}"
         - name: deleteExisting

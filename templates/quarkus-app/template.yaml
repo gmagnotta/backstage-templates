@@ -126,7 +126,7 @@ spec:
       input:
         allowedHosts: ['github.com']
         description: ${{ parameters.description }}
-        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.appName }}-config
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.appName }}-gitops
         defaultBranch: ${{ parameters.repoBranchName }}
         sourcePath: ./gitops
         repoVisibility: public
@@ -138,7 +138,7 @@ spec:
     #     appName: ${{ parameters.appName }}
     #     argoInstance: main
     #     namespace: ${{ parameters.namespace }}
-    #     repoUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config
+    #     repoUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-gitops
     #     path: 'overlay/dev'
 
     - id: argocd
@@ -156,7 +156,7 @@ spec:
           spec:
             project: default
             source:
-              repoURL: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-config.git
+              repoURL: https://github.com/${{ parameters.orgName }}/${{ parameters.appName }}-gitops.git
               targetRevision: ${{ values.repoBranchName }}
               path: overlay/dev
             destination:
