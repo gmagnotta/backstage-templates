@@ -31,7 +31,7 @@ spec:
       - env:
         - name: DNS_MEMBERSHIP_SERVICE_NAME
           value: hello-tomcat-ping
-        image: k8s.gcr.io/pause
+        image: registry.redhat.io/jboss-webserver-6/jws60-openjdk17-openshift-rhel8
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:

@@ -125,9 +125,14 @@ spec:
             apiVersion: apps/v1
             kind: Deployment
             metadata:
+              labels:
+                backstage.io/kubernetes-id: ${{ values.appName }}
               name: hello-tomcat
             spec:
               template:
+                metadata:
+                  labels:
+                    backstage.io/kubernetes-id: ${{ values.appName }}
                 spec:
                   containers:
                     - image: $(tasks.generate-sbom.results.IMAGE_URL)@$(tasks.generate-sbom.results.IMAGE_DIGEST)
