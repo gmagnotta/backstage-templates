@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
 - ../../base
 - pipeline-build.yaml
-- build-configmap.yaml
 - buildah_s2i_task.yaml
 - generate_sbom_task.yaml
 - vulnerability_sbom_task.yaml

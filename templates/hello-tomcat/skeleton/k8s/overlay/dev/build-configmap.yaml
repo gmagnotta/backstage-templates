@@ -5,8 +5,8 @@ metadata:
 data:
   env: |
     #MAVEN_CLEAR_REPO=true
-    #MAVEN_S2I_GOALS=clean package sonar:sonar
-    #MAVEN_ARGS_APPEND=-Dsonar.projectKey=hello-tomcat -Dsonar.projectName='hello-tomcat' -Dsonar.host.url=http://sonarqube  -Dsonar.token=sqp_ae716219200c705ff2ff1698f2e2c860573d12aa
+    MAVEN_S2I_GOALS=clean package sonar:sonar
+    #MAVEN_ARGS_APPEND=-Dsonar.projectKey=${{ values.appName }} -Dsonar.projectName='${{ values.appName }}' -Dsonar.host.url=https://sonarqube  -Dsonar.token=sqp_puthereyourtoken
     #
     # MAVEN REPO TO PUSH ARTIFACTS
     #
