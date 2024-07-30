@@ -207,5 +207,9 @@ spec:
       #- title: SonarQube project URL
       #  url: ${{ steps['create-sonar-project'].output.projectUrl }}
     text:
-      - title: Things to do
-        content: You need to create ssh credentials to let the pipeline commit code and check repository permissions
+      - title: Import SSH Key
+        content: Import an ssh key to allow the pipeline to commit to gitops repository
+      - title: Check GitHub repositories permissions
+        content: Verifiy that git repositories allow to commit in correct branch
+      - title: Check SonarQube integration
+        content: Verify that your project is using correct token for SonarQube integration
