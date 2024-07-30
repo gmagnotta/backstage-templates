@@ -1,3 +1,3 @@
-# quarkus-echo
+# ${{ values.appName }}
 
-Example Quarkus app that exposes a secured rest endpoint
+${{ values.description }}
