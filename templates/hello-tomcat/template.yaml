@@ -213,3 +213,5 @@ spec:
         content: Verifiy that git repositories allow to commit in correct branch
       - title: Check SonarQube integration
         content: Verify that your project is using correct token for SonarQube integration
+      - title: Import container registry credentials
+        content: Import container registry credentials for promoting application
