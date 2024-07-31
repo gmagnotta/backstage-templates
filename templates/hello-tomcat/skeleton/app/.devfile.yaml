@@ -1,54 +1,55 @@
-schemaVersion: 2.2.0
+schemaVersion: 2.2.2
 metadata:
-  generateName: ${{ values.appName }}
+  name: hello-tomcat
+  version: 1.0.0
 components:
-  - name: development-tooling
+  - name: jboss-webserver-6
     container:
-      image: quay.io/devfile/universal-developer-image:ubi8-277c10c
-      env:
-        - name: QUARKUS_HTTP_HOST
-          value: 0.0.0.0
-        - name: MAVEN_OPTS
-          value: "-Dmaven.repo.local=/home/user/.m2/repository"
-      memoryLimit: 5Gi
-      cpuLimit: 2500m
-      volumeMounts:
-        - name: m2
-          path: /home/user/.m2
+      image: registry.redhat.io/jboss-webserver-6/jws60-openjdk17-openshift-rhel8@sha256:8ff2a1c968d3cca627e31e2cb9c336dafa651fe2d29cb64827f6cf6e877b6ab3
+      mountSources: true
       endpoints:
-        - name: quarkus-dev
+        - name: http
           targetPort: 8080
-          exposure: public
-          secure: false
-          protocol: https
-          path: hello
-        - name: debug
-          targetPort: 5005
-          exposure: none
-          secure: false
-          protocol: tcp
-        - name: tests
-          targetPort: 8081
-          exposure: none
-          secure: false
-          protocol: tcp
+          protocol: http
+      env:
+        - name: AN_ENV_VARIABLE
+          value: 'THE_CONTENT'
+      volumeMounts:
+        - name: deployments
+          path: /deployments
+        - name: m2
+          path: /tmp/m2
+  - name: deployments
+    volume:
+      size: 1Gi
   - name: m2
     volume:
-      size: 1G
+      size: 1Gi
 commands:
-  - id: package
+  - id: compile
     exec:
-      label: "1. Package the application"
-      component: development-tooling
-      commandLine: "./mvnw package"
+      component: jboss-webserver-6
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: 'mvn clean package -Dmaven.repo.local=/tmp/m2'
+  - id: copyresources
+    exec:
+      component: jboss-webserver-6
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: 'cp $PROJECT_SOURCE/target/ROOT.war /deployments/'
+  - id: compileandcopy
+    composite:
+      commands:
+        - compile
+        - copyresources
+      parallel: false
       group:
         kind: build
         isDefault: true
-  - id: start-dev
+  - id: run
     exec:
-      label: "2. Start Development mode (Hot reload + debug)"
-      component: development-tooling
-      commandLine: "./mvnw compile quarkus:dev"
+      component: jboss-webserver-6
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: '/usr/local/s2i/run'
       group:
         kind: run
         isDefault: true
