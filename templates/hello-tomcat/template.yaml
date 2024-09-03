@@ -208,11 +208,11 @@ spec:
       #- title: SonarQube project URL
       #  url: ${{ steps['create-sonar-project'].output.projectUrl }}
     text:
-      - title: Import SSH Key
-        content: Import an ssh key to allow the pipeline to commit to gitops repository
+      - title: Import gitops SSH Key
+        content: Create a secret called 'ssh' in dev project with field 'id_rsa' containing the ssh key to commit to gitops repository
       - title: Check GitHub repositories permissions
         content: Verifiy that git repositories allow to commit in correct branch
-      - title: Check SonarQube integration
-        content: Verify that your project is using correct token for SonarQube integration
+      - title: Check Maven and SonarQube integration
+        content: Verify that your project provides a configmap 'hello-tomcat-s2ienvironment' with valid maven variables for SonarQube integration
       - title: Import container registry credentials
         content: Import container registry credentials for promoting application
