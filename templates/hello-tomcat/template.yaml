@@ -215,4 +215,4 @@ spec:
       - title: Check Maven and SonarQube integration
         content: Verify that your project provides a configmap 'hello-tomcat-s2ienvironment' with valid maven variables for SonarQube integration (url and user token)
       - title: Import quay.io registry credentials
-        content: Import container registry credentials for promoting the application
+        content: Import container registry credentials for promoting the application and then 'oc secrets link pipeline quayio -n <project>'
