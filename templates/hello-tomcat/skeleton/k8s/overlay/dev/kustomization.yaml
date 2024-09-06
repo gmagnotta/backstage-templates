@@ -19,6 +19,7 @@ resources:
 - triggertemplate-promote.yaml
 - pipeline-promote.yaml
 - build-configmap.yaml
+- gitops_secrets.yaml
 
 patchesStrategicMerge:
 - deployment.yaml
