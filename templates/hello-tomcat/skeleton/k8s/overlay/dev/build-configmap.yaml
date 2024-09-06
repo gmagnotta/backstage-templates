@@ -6,7 +6,7 @@ data:
   env: |
     #MAVEN_CLEAR_REPO=true
     MAVEN_S2I_GOALS=clean package sonar:sonar
-    MAVEN_ARGS_APPEND=-Dsonar.projectKey=${{ values.appName }} -Dsonar.projectName='${{ values.appName }}' -Dsonar.host.url=https://sonarqube  -Dsonar.token=sqp_puthereyourtoken
+    MAVEN_ARGS_APPEND=-Dsonar.projectKey=${{ values.appName }} -Dsonar.projectName='${{ values.appName }}' -Dsonar.host.url=${{ values.sonarqubeHost }}  -Dsonar.token=${{ values.sonarqubeToken }}
     #
     # MAVEN REPO TO PUSH ARTIFACTS
     #

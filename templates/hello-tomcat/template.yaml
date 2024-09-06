@@ -26,6 +26,8 @@ spec:
         - description
         - registryUrl
         - clusterDomain
+        - sonarqubeHost
+        - sonarqubeToken
       properties:
         orgName:
           title: Organization name
@@ -55,6 +57,14 @@ spec:
           title: OpenShift Cluster Domain
           type: string
           default: apps.localdomain
+        sonarqubeHost:
+          title: SonarQube host
+          type: string
+          default: https://sonarqubeHost
+        sonarqubeToken:
+          title: SonarQube Token
+          type: string
+          default: sonarqubetoken
   steps:
     - id: sourceCodeTemplate
       name: Generating the Source Code Component
@@ -96,6 +106,8 @@ spec:
           registryUrl: ${{ parameters.registryUrl }}
           namespace: ${{ parameters.namespace }}
           defaultBranch: ${{ parameters.repoBranchName }}
+          sonarqubeHost: ${{ parameters.sonarqubeHost }}
+          sonarqubeToken: ${{ parameters.sonarqubeToken }}
         targetPath: ./gitops
         copyWithoutTemplating: ['**/*task.yaml', '**/*.css.map']
 
@@ -108,7 +120,7 @@ spec:
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.appName }}-gitops
         defaultBranch: ${{ parameters.repoBranchName }}
         sourcePath: ./gitops
-        repoVisibility: public
+        repoVisibility: private
 
     # - id: create-argocd-resources
     #   name: Create ArgoCD Resources
